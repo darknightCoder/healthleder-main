@@ -1,0 +1,47 @@
+version: '3'
+services:
+
+  api:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    command: npm start
+    environment:
+      PORT: 5555
+      NODE_ENV: 'PRODUCTION'
+      SERVER: mongodb://db
+      PORT_DB: 27017
+      BLOCKCHAIN_HOST: http://ganache
+      BLOCKCHAIN_PORT: 8545
+      JWT_SECRET: 'secret'      
+    volumes:
+      - './api:/api'
+    networks:
+      blockchain_network:
+    ports:
+      - 8080:3000
+  ui: 
+    build:
+      context: ./ui
+      dockerfile: ./.docker/Dockerfile_dev
+    command: npm start
+    environment: 
+       PORT: 3001  
+    volumes: 
+      - './ui/src:/home/node/angular-seed/src'  
+    ports:
+      - 5555:3001
+    networks:
+      blockchain_network:
+  db: 
+    image: mongo:latest
+    volumes:
+      - './data:/data'
+    ports:
+      - 27017:27017
+    networks:
+      blockchain_network:                   
+
+networks:
+  blockchain_network:
+    driver: bridge
